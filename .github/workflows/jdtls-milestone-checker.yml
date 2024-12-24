@@ -23,17 +23,12 @@ jobs:
           pip install requests
           echo "latest_version=$(python ./get_latest.py)" >> $GITHUB_ENV
 
-      - name: Check if release already exists
-        id: check_release
+      - name: Get Current Release
+        id: get_current_release
+        uses: joutvhu/get-release@v1
+        with:
+          debug: true
+
+      - name: Echo
         run: |
-          echo "${{env.latest_version}}"
-          # EXISTING_RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          #   https://api.github.com/repos/${{ github.repository }}/releases \
-          #   | jq -r --arg version "${{ env.latest_version }}" '.[] | select(.tag_name==$version) | .tag_name')
-          #
-          # if [ "$EXISTING_RELEASE" = "${{ env.latest_version }}" ]; then
-          #   echo "Release $EXISTING_RELEASE already exists. Skipping."
-          #   echo "release_exists=true" >> $GITHUB_ENV
-          # else
-          #   echo "Release does not exist."
-          #   echo "release_exists=false" >> $GITHUB_ENV
+          echo "${{ steps.get_current_release.outputs.upload_url }}"
