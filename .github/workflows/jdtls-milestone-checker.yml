@@ -43,3 +43,4 @@ jobs:
         run: |
           pip install requests
           python ./repackage.py
+          ls
