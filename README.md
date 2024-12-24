@@ -9,9 +9,10 @@
 This project daily checks new JDTLS versions and re-package new versions without timestamps in the package and equinox launcher
 
 Related issues:
-https://github.com/mason-org/mason-registry/issues/8073
-https://github.com/mason-org/mason-registry/issues/5788
-https://github.com/mason-org/mason-registry/issues/3017
+
+- https://github.com/mason-org/mason-registry/issues/8073
+- https://github.com/mason-org/mason-registry/issues/5788
+- https://github.com/mason-org/mason-registry/issues/3017
 
 ## How to Install
 
