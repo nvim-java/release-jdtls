@@ -23,12 +23,22 @@ jobs:
           pip install requests
           echo "latest_version=$(python ./get_latest.py)" >> $GITHUB_ENV
 
-      - name: Get Current Release
-        id: get_current_release
-        uses: joutvhu/get-release@v1
-        with:
-          debug: true
-
-      - name: Echo
+      - name: Fetch Repository Releases and Check for Version 10.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "${{ steps.get_current_release.outputs.upload_url }}"
+          echo "Fetching releases for repository..."
+          releases=$(curl -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/releases)
+
+          echo "Checking for version 10.3..."
+          if echo "$releases" | jq -e '.[] | select(.tag_name == "10.3")' > /dev/null; then
+            echo "Version 10.3 found!"
+          else
+            echo "Version 10.3 not found."
+            exit 1
+          fi
+      - name: test
+        run: |
+          echo '*************'
