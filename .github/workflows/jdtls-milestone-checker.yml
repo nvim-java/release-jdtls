@@ -1,0 +1,66 @@
+name: JDTLS Milestone Release Checker
+
+on:
+  schedule:
+    # Runs daily at midnight UTC
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  check-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Get latest milestone from Eclipse
+        id: get_latest
+        run: |
+          # Fetch the latest milestone release page
+          LATEST_PAGE=$(curl -s https://download.eclipse.org/jdtls/milestones | grep -oP 'href="\K[0-9]+(?=/")' | sort -n | tail -1)
+          if [ -z "$LATEST_PAGE" ]; then
+            echo "Error: Unable to fetch latest milestone page."
+            exit 1
+          fi
+
+          # Check for existing release
+          echo "latest_version=$LATEST_PAGE" >> $GITHUB_ENV
+          echo "Latest milestone page: $LATEST_PAGE"
+
+      - name: Check if release already exists
+        id: check_release
+        run: |
+          EXISTING_RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/releases \
+            | jq -r --arg version "${{ env.latest_version }}" '.[] | select(.tag_name==$version) | .tag_name')
+
+          if [ "$EXISTING_RELEASE" = "${{ env.latest_version }}" ]; then
+            echo "Release $EXISTING_RELEASE already exists. Skipping."
+            echo "release_exists=true" >> $GITHUB_ENV
+          else
+            echo "Release does not exist."
+            echo "release_exists=false" >> $GITHUB_ENV
+
+      - name: Download milestone files
+        if: env.release_exists == 'false'
+        run: |
+          mkdir -p jdtls
+          curl -LO "https://download.eclipse.org/jdtls/milestones/${{ env.latest_version }}/jdt-language-server-${{ env.latest_version }}.tar.gz"
+          mv jdt-language-server-${{ env.latest_version }}.tar.gz jdtls/
+
+      - name: Create GitHub release
+        if: env.release_exists == 'false'
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ env.latest_version }}
+          release_name: "JDTLS Milestone ${{ env.latest_version }}"
+          body: |
+            JDTLS Milestone Release: ${{ env.latest_version }}
+            Downloaded from [Eclipse JDTLS Milestones](https://download.eclipse.org/jdtls/milestones/).
+          draft: false
+          prerelease: true
+          files: |
+            jdtls/jdt-language-server-${{ env.latest_version }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
