@@ -9,6 +9,9 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   check-and-release:
     runs-on: ubuntu-latest
@@ -45,7 +48,11 @@ jobs:
           python ./repackage.py
           ls
 
-      - name: Release repackaged jdtls
-        uses: actions/upload-artifact@v4
+      - name: Release
+        if: env.release_exists == 'false'
+        uses: softprops/action-gh-release@v2
         with:
-          path: jdtls.tar.gz
+          files: jdtls.tar.gz
+          make_latest: "true"
+          name: "${{env.latest_version}}"
+          tag_name: "${{env.latest_version}}"
