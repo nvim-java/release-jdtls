@@ -39,6 +39,6 @@ jobs:
           fi
 
       - name: test
-        if: env.release_exists == 'false'
+        if: env.release_exists == 'true'
         run: |
           echo '************* ${{ env.release_exists }}'
