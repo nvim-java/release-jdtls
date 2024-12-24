@@ -17,13 +17,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Get latest milestone from Eclipse
+      - name: Get latest jdtls version
         id: get_latest
         run: |
           pip install requests
           echo "latest_version=$(python ./get_latest.py)" >> $GITHUB_ENV
 
-      - name: Fetch Repository Releases and Check for Version 10.3
+      - name: Check if latest version has been released
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -38,7 +38,8 @@ jobs:
             echo "release_exists=false" >> $GITHUB_ENV
           fi
 
-      - name: test
-        if: env.release_exists == 'true'
+      - name: Repackage jdtls
+        if: env.release_exists == 'false'
         run: |
-          echo '************* ${{ env.release_exists }}'
+          pip install requests
+          python ./repackage.py

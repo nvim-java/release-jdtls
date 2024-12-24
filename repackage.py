@@ -58,7 +58,7 @@ def extract_tar_gz(tar_gz_path, equinox_plugin_path):
                 with tarfile.open(out_path, "w:gz") as tarout:
                     for file in os.listdir(ex_dir):
                         tarout.add(f'{ex_dir}/{file}',arcname=file, recursive=True)
-                copyfile(f'{tmpout}/jdtls.tar.gz', '/home/s1n7ax/Downloads/Test/jdtls.tar.gz')
+                copyfile(f'{tmpout}/jdtls.tar.gz', './jdtls.tar.gz')
 
 
 version = get_latest_version()
