@@ -1,9 +1,12 @@
 name: JDTLS Milestone Release Checker
 
 on:
-  schedule:
-    # Runs daily at midnight UTC
-    - cron: "0 0 * * *"
+  # schedule:
+  # Runs daily at midnight UTC
+  # - cron: "0 0 * * *"
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -23,13 +26,14 @@ jobs:
       - name: Check if release already exists
         id: check_release
         run: |
-          EXISTING_RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/releases \
-            | jq -r --arg version "${{ env.latest_version }}" '.[] | select(.tag_name==$version) | .tag_name')
-
-          if [ "$EXISTING_RELEASE" = "${{ env.latest_version }}" ]; then
-            echo "Release $EXISTING_RELEASE already exists. Skipping."
-            echo "release_exists=true" >> $GITHUB_ENV
-          else
-            echo "Release does not exist."
-            echo "release_exists=false" >> $GITHUB_ENV
+          echo "${{env.latest_version}}"
+          # EXISTING_RELEASE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          #   https://api.github.com/repos/${{ github.repository }}/releases \
+          #   | jq -r --arg version "${{ env.latest_version }}" '.[] | select(.tag_name==$version) | .tag_name')
+          #
+          # if [ "$EXISTING_RELEASE" = "${{ env.latest_version }}" ]; then
+          #   echo "Release $EXISTING_RELEASE already exists. Skipping."
+          #   echo "release_exists=true" >> $GITHUB_ENV
+          # else
+          #   echo "Release does not exist."
+          #   echo "release_exists=false" >> $GITHUB_ENV
