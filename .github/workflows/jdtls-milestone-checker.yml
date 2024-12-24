@@ -1,0 +1,58 @@
+name: JDTLS Milestone Release Checker
+
+on:
+  schedule:
+    # Runs daily at midnight UTC
+    - cron: "0 0 * * *"
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Get latest jdtls version
+        id: get_latest
+        run: |
+          pip install requests
+          echo "latest_version=$(python ./get_latest.py)" >> $GITHUB_ENV
+
+      - name: Check if latest version has been released
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Fetching releases for repository..."
+          releases=$(curl -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/${{ github.repository }}/releases)
+
+          if echo "$releases" | jq -e '.[] | select(.tag_name == "${{ env.latest_version }}")' > /dev/null; then
+            echo "release_exists=true" >> $GITHUB_ENV
+          else
+            echo "release_exists=false" >> $GITHUB_ENV
+          fi
+
+      - name: Repackage jdtls
+        if: env.release_exists == 'false'
+        run: |
+          pip install requests
+          python ./repackage.py
+          ls
+
+      - name: Release
+        if: env.release_exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: jdtls.tar.gz
+          make_latest: "true"
+          name: "${{env.latest_version}}"
+          tag_name: "${{env.latest_version}}"
