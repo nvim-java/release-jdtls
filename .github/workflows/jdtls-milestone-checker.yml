@@ -44,3 +44,8 @@ jobs:
           pip install requests
           python ./repackage.py
           ls
+
+      - name: Release repackaged jdtls
+        uses: actions/upload-artifact@v4
+        with:
+          path: jdtls.tar.gz
