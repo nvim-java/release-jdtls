@@ -23,6 +23,9 @@ permissions:
 
 jobs:
   check-and-release:
+    env:
+      JDTLS_VERSION: ${{ github.event.inputs.JDTLS_VERSION }}
+      FORCE_REPACKAGE: ${{ github.event.inputs.FORCE_REPACKAGE }}
     runs-on: ubuntu-latest
 
     steps:
@@ -36,6 +39,7 @@ jobs:
           echo "JDTLS_VERSION=$(python ./get_latest.py)" >> $GITHUB_ENV
 
       - name: Check if latest version has been released
+        if: env.FORCE_REPACKAGE == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -51,7 +55,7 @@ jobs:
           fi
 
       - name: Repackage jdtls
-        if: env.RELEASE_EXISTS == 'false'
+        if: env.RELEASE_EXISTS == 'false' || env.FORCE_REPACKAGE == 'true'
         run: |
           pip install requests
           python ./repackage.py
