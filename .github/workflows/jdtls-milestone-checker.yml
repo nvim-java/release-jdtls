@@ -63,9 +63,7 @@ jobs:
 
       - name: Debug
         run: |
-          echo "${{ github.event.inputs.JDTLS_VERSION }}"
-          echo "${{ env.JDTLS_VERSION }}"
-          echo "${{ env.FORCE_REPACKAGE }}"
+          env
 
       - name: Release
         if: env.RELEASE_EXISTS == 'false' || env.FORCE_REPACKAGE == 'true'
