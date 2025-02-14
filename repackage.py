@@ -1,11 +1,10 @@
 import re
 import requests
 from urllib.parse import urljoin
-import urllib.request
 import tarfile
 import os
 import tempfile
-from shutil import move, copyfile
+from shutil import copyfile 
 
 base_url = 'https://download.eclipse.org/jdtls/milestones/'
 
@@ -52,7 +51,10 @@ def extract_tar_gz(tar_gz_path, equinox_plugin_path):
         with tempfile.TemporaryDirectory() as tmp:
             ex_dir = f'{tmp}/jdtls'
             tar.extractall(path=ex_dir)
-            move(f'{ex_dir}/plugins/{equinox_plugin_path}', f'{ex_dir}/plugins/org.eclipse.equinox.launcher.jar')
+            # creating a hard link instead of moving the file
+            # https://github.com/nvim-java/release-jdtls/issues/1
+            os.link(f'{ex_dir}/plugins/{equinox_plugin_path}', f'{ex_dir}/plugins/org.eclipse.equinox.launcher.jar')
+            # move(f'{ex_dir}/plugins/{equinox_plugin_path}', f'{ex_dir}/plugins/org.eclipse.equinox.launcher.jar')
             with tempfile.TemporaryDirectory() as tmpout:
                 out_path = f'{tmpout}/jdtls.tar.gz'
                 with tarfile.open(out_path, "w:gz") as tarout:
