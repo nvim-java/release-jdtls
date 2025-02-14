@@ -70,6 +70,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: jdtls.tar.gz
-          make_latest: env.GITHUB_EVENT_NAME == 'schedule' && 'true' || 'false'
+          make_latest: "${{ github.event_name == 'scheduled' && 'true' || 'false' }}"
           name: "${{env.JDTLS_VERSION}}"
           tag_name: "${{env.JDTLS_VERSION}}"
