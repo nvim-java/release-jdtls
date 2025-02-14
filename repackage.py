@@ -63,9 +63,12 @@ def extract_tar_gz(tar_gz_path, equinox_plugin_path):
                 copyfile(f'{tmpout}/jdtls.tar.gz', './jdtls.tar.gz')
 
 
+
 if os.environ.get('jdtls_version'):
+    is_custom_version = True
     version = os.environ.get('jdtls_version')
 else:
+    is_custom_version = False
     version = get_latest_version()
 
 print(f"re-packaging version {version}")
