@@ -8,6 +8,10 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      jdtls_version:
+        description: "jdtls version"
+        required: false
 
 permissions:
   contents: write
