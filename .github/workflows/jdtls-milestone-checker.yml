@@ -52,11 +52,15 @@ jobs:
           python ./repackage.py
           ls
 
+      - name: Debug
+        run: |
+          env
+
       - name: Release
         if: env.release_exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
           files: jdtls.tar.gz
-          make_latest: "${{ env.jdtls_version != '' ? 'false' : 'true' }}"
+          make_latest: "${{ env.jdtls_version = '' ? 'true' || 'false' }}"
           name: "${{env.latest_version}}"
           tag_name: "${{env.latest_version}}"
