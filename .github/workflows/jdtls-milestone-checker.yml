@@ -44,7 +44,7 @@ jobs:
             -H "Accept: application/vnd.github.v3+json" \
             https://api.github.com/repos/${{ github.repository }}/releases)
 
-          if echo "$releases" | jq -e '.[] | select(.tag_name == "${{ env.latest_version }}")' > /dev/null; then
+          if echo "$releases" | jq -e '.[] | select(.tag_name == "${{ env.JDTLS_VERSION }}")' > /dev/null; then
             echo "RELEASE_EXISTS=true" >> $GITHUB_ENV
           else
             echo "RELEASE_EXISTS=false" >> $GITHUB_ENV
@@ -67,5 +67,5 @@ jobs:
         with:
           files: jdtls.tar.gz
           make_latest: env.jdtls_version != '' && 'false' || 'true'
-          name: "${{env.latest_version}}"
-          tag_name: "${{env.latest_version}}"
+          name: "${{env.JDTLS_VERSION}}"
+          tag_name: "${{env.JDTLS_VERSION}}"
