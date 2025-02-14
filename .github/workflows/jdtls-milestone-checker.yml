@@ -61,6 +61,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: jdtls.tar.gz
-          make_latest: "${{ env.jdtls_version = '' ? 'true' || 'false' }}"
+          make_latest: "${{ env.jdtls_version != '' && 'false' || 'true' }}"
           name: "${{env.latest_version}}"
           tag_name: "${{env.latest_version}}"
